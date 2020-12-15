@@ -14,6 +14,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "hyperloglog",
+        "pydantic",
         "requests",
     ],
     tests_require=[
