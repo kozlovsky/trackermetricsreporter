@@ -12,6 +12,7 @@ class TestPeer:
 
 def test_reporter_1():
     reporter = MetricsReporter(1234)
+    reporter.start()
     reporter.shutdown()
     assert reporter.finished
 
@@ -21,6 +22,7 @@ def test_reporter_2():
                                 collector_url='')
 
     reporter = MetricsReporter(1234, settings)
+    reporter.start()
 
     for i in range(10):
         reporter.count_peer(TestPeer(f"Peer{i}"), f"Address{i}", f"Service{i}")

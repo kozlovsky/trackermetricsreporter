@@ -55,9 +55,11 @@ class MetricsReporter:
         self.input_thread = InputThread(self)
         self.output_thread = OutputThread(self)
         self.exiting = threading.Event()
+        self.finished = False
+
+    def start(self):
         self.input_thread.start()
         self.output_thread.start()
-        self.finished = False
 
     def shutdown(self):
         logging.info('Shutting down MetricsReporter...')
