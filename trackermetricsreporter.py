@@ -11,6 +11,9 @@ import pydantic
 import requests
 
 
+logging.basicConfig(level=logging.INFO)
+
+
 SECOND = 1
 MINUTE = 60
 HOUR = 60 * MINUTE
@@ -61,6 +64,7 @@ class MetricsReporter:
         self.finished = False
 
     def start(self):
+        logging.info('Starting MetricsReporter input & output threads')
         self.input_thread.start()
         self.output_thread.start()
 
