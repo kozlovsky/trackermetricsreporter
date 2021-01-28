@@ -15,11 +15,14 @@ SECOND = 1
 MINUTE = 60
 HOUR = 60 * MINUTE
 
-COLLECTOR_URL = 'http://dashboard.tribler.org:3322/bootstrap/report'
+COLLECTOR_URL = 'http://131.180.27.189:3322/tracker/report'
 REPORTING_INTERVAL = 120 * SECOND
 MAX_QUEUE_SIZE = 100000
 COUNTER_ERROR_RATE = 0.01
 COUNTER_WINDOW = HOUR
+
+
+start_time = time.time()
 
 
 class ReporterSettings(pydantic.BaseSettings):
@@ -110,12 +113,12 @@ class MetricsReporter:
             peers = self.peers.LPFM.copy()
             addresses = self.addresses.LPFM.copy()
 
-        return {
-            'peers': peers,
-            'peer_count': peer_count,
-            'addresses': addresses,
-            'address_count': address_count,
-        }
+        result = dict(
+            uptime=time.time()-start_time,
+            shll_counters=dict(peers=peers, addresses=addresses),
+            shll_cardinalities=dict(peers=peer_count, addresses=address_count)
+        )
+        return result
 
     def _send_data(self, data):
         # Called from OutputThread
