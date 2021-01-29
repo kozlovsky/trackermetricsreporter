@@ -24,6 +24,7 @@ MAX_QUEUE_SIZE = 100000
 COUNTER_ERROR_RATE = 0.01
 COUNTER_WINDOW = HOUR
 
+MAX_INTRO_REQUESTS_COUNT_VALUE = 2 ** 31
 
 start_time = time.time()
 
@@ -54,6 +55,7 @@ class MetricsReporter:
         if settings is None:
             settings = ReporterSettings()
         self.settings = settings
+        self.intro_requests_count = 0
         self.peers = self.new_counter()
         self.addresses = self.new_counter()
         self.lock = threading.Lock()
@@ -102,6 +104,9 @@ class MetricsReporter:
         address_str = repr(record.address)
 
         with self.lock:
+            if self.intro_requests_count >= MAX_INTRO_REQUESTS_COUNT_VALUE:
+                self.intro_requests_count = 0
+            self.intro_requests_count += 1
             self.peers.add(record.t, peer_str)
             self.addresses.add(record.t, address_str)
 
@@ -117,11 +122,12 @@ class MetricsReporter:
             peers = self.peers.LPFM.copy()
             addresses = self.addresses.LPFM.copy()
 
-        result = dict(
-            uptime=time.time()-start_time,
-            shll_counters=dict(peers=peers, addresses=addresses),
-            shll_cardinalities=dict(peers=peer_count, addresses=address_count)
-        )
+            result = dict(
+                uptime=time.time()-start_time,
+                intro_requests_count=self.intro_requests_count,
+                shll_counters=dict(peers=peers, addresses=addresses),
+                shll_cardinalities=dict(peers=peer_count, addresses=address_count)
+            )
         return result
 
     def _send_data(self, data):
